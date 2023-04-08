@@ -5,22 +5,15 @@ import jsonwebtoken from "jsonwebtoken";
 import fs from "fs";
 
 const registerHandler = async (req, res) => {
-  const { originalname, path } = req.file;
-  const parts = originalname.split(".");
-  const ext = parts[parts.length - 1];
-  const newPath = path + "." + ext;
-  fs.renameSync(path, newPath);
-
-  const final = newPath.slice(4);
   const pass = await bcrypt.hash(req.body.password, 10);
-  const { name, location, occupation, email } = req.body;
+  const { name, image, location, occupation, email } = req.body;
 
   const newUser = new user({
     name,
     location,
     occupation,
     email,
-    image: final,
+    image: image,
     password: pass,
   });
 
@@ -44,18 +37,12 @@ const homepageHandler = async (req, res) => {
 };
 
 const newPostHandler = async (req, res) => {
-  const { originalname, path } = req.file;
+  const base64 = req.body.base64;
 
-  const parts = originalname.split(".");
-  const ext = parts[parts.length - 1];
-  const newPath = path + "." + ext;
-  fs.renameSync(path, newPath);
-
-  const final = newPath.slice(4);
   const newPost = new post({
     caption: req.body.caption,
     creator: req.body.creator,
-    image: final,
+    image: base64,
   });
   const result = await newPost.save();
   res.json(result);
