@@ -22,12 +22,17 @@ const registerHandler = async (req, res) => {
 };
 
 const loginHandler = async (req, res) => {
-  const theUser = await user.findOne({ email: req.body.email });
-  const result = await bcrypt.compare(req.body.password, theUser.password);
-  if (!result) res.json("Invalid Credentials!");
-  await theUser.populate("friends");
-  const token = jsonwebtoken.sign({ user: result }, "secret");
-  res.json([theUser, token]);
+  try {
+    const theUser = await user.findOne({ email: req.body.email });
+
+    const result = await bcrypt.compare(req.body.password, theUser.password);
+    if (!result) res.json("Invalid Credentials!");
+    await theUser.populate("friends");
+    const token = jsonwebtoken.sign({ user: result }, "secret");
+    res.json([theUser, token]);
+  } catch (e) {
+    res.json("Login Failed");
+  }
 };
 
 const homepageHandler = async (req, res) => {
